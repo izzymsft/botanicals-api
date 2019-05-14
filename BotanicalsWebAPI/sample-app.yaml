@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: node-api
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: node-api
+  template:
+    metadata:
+      labels:
+        app: node-api
+    spec:
+      containers:
+      - name: node-api
+        image: izzymsft/botanicalsapi:3.1
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 250m
+            memory: 256Mi
+        ports:
+        - containerPort: 5000
+          name: nodeapiport
+          protocol: TCP
+        imagePullPolicy: Always
+        # env:
+        # - name: VARNAME
+        #   value: "variable-value"
+      #imagePullSecrets:
+      #- name: acr-auth
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: node-api-lb
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 5000
+    protocol: TCP
+    targetPort: nodeapiport
+  selector:
+    app: node-api
